@@ -5,7 +5,9 @@ class ApnsFlutter {
 
   static void onToken(Function cb) {
     _channel.setMethodCallHandler((call) {
-      cb(call.arguments);
+      if (call.method == "onToken") {
+        cb(call.arguments);
+      }
       return;
     });
   }

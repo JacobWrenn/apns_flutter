@@ -14,13 +14,12 @@ class _MyAppState extends State<MyApp> {
   String token;
 
   void register() async {
-    await ApnsFlutter.requestPermissions(badge: true, alert: true, sound: true);
     ApnsFlutter.onToken((token) {
       setState(() {
         this.token = token;
       });
     });
-    ApnsFlutter.configure();
+    ApnsFlutter.requestPermissions(badge: true, alert: true, sound: true);
   }
 
   @override

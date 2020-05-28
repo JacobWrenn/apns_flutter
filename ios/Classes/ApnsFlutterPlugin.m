@@ -110,9 +110,6 @@ static NSObject<FlutterPluginRegistrar> *_registrar;
             [[UIApplication sharedApplication] registerForRemoteNotifications];
             result([NSNumber numberWithBool:YES]);
         }
-    } else if ([@"configure" isEqualToString:method]) {
-        [[UIApplication sharedApplication] registerForRemoteNotifications];
-        result(nil);
     } else {
         result(FlutterMethodNotImplemented);
     }
