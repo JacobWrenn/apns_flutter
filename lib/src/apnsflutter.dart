@@ -3,20 +3,32 @@ import 'package:flutter/services.dart';
 
 /// Contains all the methods for interacting with the iOS notifications system.
 class ApnsFlutter {
+  static final ApnsFlutter _apnsFlutter = ApnsFlutter._internal();
+
   final MethodChannel _channel = const MethodChannel('apns_flutter');
 
   Function _onTokenFn;
   Function _onSettingsFn;
+  Function _onTapFn;
 
-  /// Creates an instance that can communicate with iOS.
-  ApnsFlutter() {
+  /// The most recent notification that was tapped. Useful for knowing if a notiifcation tap caused your app to open.
+  ApnsNotification mostRecentTap;  
+
+  /// Get the [ApnsFlutter] singleton.
+  factory ApnsFlutter() {
+    return _apnsFlutter;
+  }
+
+  ApnsFlutter._internal() {
     _channel.setMethodCallHandler((call) {
       if (call.method == "onToken" && _onTokenFn != null) {
         _onTokenFn(call.arguments);
       } else if (call.method == "onSettings" && _onSettingsFn != null) {
         _onSettingsFn(ApnsSettings.fromJSON(call.arguments));
       } else if (call.method == "notificationTapped") {
-        print(call.arguments);
+        final notification = ApnsNotification.fromJSON(call.arguments);
+        mostRecentTap = notification;
+        if (_onTapFn != null) _onTapFn(notification);
       }
       return;
     });
@@ -42,6 +54,11 @@ class ApnsFlutter {
   /// Sets a callback function to receive the notification settings as [ApnsSettings].
   void onSettings(Function onSettings) {
     this._onSettingsFn = onSettings;
+  }
+
+  /// Sets a callback function to receive a notification tap event as [ApnsNotification].
+  void onTap(Function onTap) {
+    this._onTapFn = onTap;
   }
 
   /// Requests notification permissions and a token.
